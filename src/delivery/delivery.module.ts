@@ -2,6 +2,6 @@ import { Module } from '@nestjs/common';
 import { DeliveryService } from './delivery.service';
 
 @Module({
-  providers: [DeliveryService],
+  controllers: [DeliveryService],
 })
 export class DeliveryModule {}

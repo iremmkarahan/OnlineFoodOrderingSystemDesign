@@ -1,19 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Controller, Logger } from '@nestjs/common';
+import { EventPattern, Payload } from '@nestjs/microservices';
 
-@Injectable()
+@Controller() // 👈 Add this decorator
 export class DeliveryService {
   private readonly logger = new Logger(DeliveryService.name);
 
-  @MessagePattern('order_created')
-  handleOrderCreated(@Payload() data: any) {
-    this.logger.log(`New order received for delivery: ${JSON.stringify(data)}`);
-    // here you could assign a driver, calculate ETA, etc.
+  constructor() {
+    this.logger.log('🚀 DeliveryService initialized');
   }
 
-  @MessagePattern('order_status_updated')
+  @EventPattern('order_created')
+  handleOrderCreated(@Payload() data: any) {
+    this.logger.log(
+      `📦 New order received for delivery: ${JSON.stringify(data)}`,
+    );
+  }
+
+  @EventPattern('order_status_updated')
   handleOrderStatusUpdated(@Payload() data: any) {
-    this.logger.log(`Order status updated: ${JSON.stringify(data)}`);
-    // here you could notify customer, update delivery tracking, etc.
+    this.logger.log(`🚚 Order status updated: ${JSON.stringify(data)}`);
   }
 }
