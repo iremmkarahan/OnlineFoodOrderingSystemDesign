@@ -17,6 +17,7 @@ import { AppService } from './app.service';
       synchronize: true,
     }),
     OrdersModule,
+    DeliveryModule,
   ],
   controllers: [AppController], 
   providers: [AppService],       
