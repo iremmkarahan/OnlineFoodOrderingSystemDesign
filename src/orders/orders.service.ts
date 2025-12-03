@@ -1,17 +1,18 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './order.entity';
 import { ClientProxy } from '@nestjs/microservices';
-//OrdersService handles CRUD operations and microservice communication
+
 @Injectable()
 export class OrdersService {
+  // Logger to show RMQ events in Railway logs
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
-    //injects TypeORM repository for database interactions
     @InjectRepository(Order)
     private ordersRepo: Repository<Order>,
 
-    //injects the RabbitMQ ClientProxy for event publishing
     @Inject('ORDERS_PUBLISHER')
     private client: ClientProxy,
   ) {}
@@ -29,15 +30,22 @@ export class OrdersService {
   }
 
   async create(data: Partial<Order>) {
-    // creates a new order entity and sets the initial status to pending
     const order = this.ordersRepo.create({
       ...data,
       status: 'PENDING',
     });
+
     const saved = await this.ordersRepo.save(order);
 
-    // 🔴 Publish event to RabbitMQ
-    //delivery microservice will consume this event
+    // 📤 Add log BEFORE sending the event
+    this.logger.log(
+      `📤 Emitting order_created event → ${JSON.stringify({
+        id: saved.id,
+        customerName: saved.customerName,
+      })}`,
+    );
+
+    // Emit event
     void this.client.emit('order_created', {
       id: saved.id,
       customerName: saved.customerName,
@@ -54,7 +62,15 @@ export class OrdersService {
     order.status = status;
     const saved = await this.ordersRepo.save(order);
 
-    // 🔴 Publish status update event
+    // 📤 Add log BEFORE sending the event
+    this.logger.log(
+      `📤 Emitting order_status_updated event → ${JSON.stringify({
+        id: saved.id,
+        status: saved.status,
+      })}`,
+    );
+
+    // Emit status update event
     void this.client.emit('order_status_updated', {
       id: saved.id,
       status: saved.status,
