@@ -1,4 +1,3 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrdersModule } from './orders/orders.module';
@@ -13,7 +12,8 @@ import { OrdersModule } from './orders/orders.module';
       password: process.env.PGPASSWORD,
       database: process.env.PGDATABASE,
       autoLoadEntities: true,
-      synchronize: true, 
+      synchronize: true,
+    }),
     OrdersModule,
   ],
 })
