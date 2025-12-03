@@ -1,23 +1,23 @@
+// src/delivery/delivery.main.ts
 import { NestFactory } from '@nestjs/core';
 import { DeliveryAppModule } from './delivery.app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  // creates a NestJS microservice to use RabbitMQ Transport.
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     DeliveryAppModule,
     {
-      transport: Transport.RMQ, // specifies RabbitMQ as the transport layer
+      transport: Transport.RMQ,
       options: {
-        urls: ['amqp://guest:guest@localhost:5672'], // RabbitMQ connection URL
-        queue: 'orders_queue', // the nameo f the queue to listen to for events
+        urls: [process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672'],
+        queue: process.env.RABBITMQ_QUEUE || 'orders_queue',
         queueOptions: {
-          durable: true, // ensure queue persists even if broker restarts
+          durable: true,
         },
       },
     },
   );
-  // starts the microservice listener
+
   await app.listen();
   console.log('🚀 Delivery microservice is running...');
 }
