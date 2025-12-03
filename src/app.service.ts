@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
 
-// Application service containing reusable business logic.
-// This service is injected into controllers to provide data or execute operations. 
 @Injectable()
 export class AppService {
-
-  // Returns a simple greeting message (placeholder for future business logic). 
-  getHello(): string {
-    return 'Hello World!';
+  getHello() {
+    return {
+      name: 'Online Food Ordering API',
+      status: 'running',
+      version: '1.0.0',
+      endpoints: [
+        '/orders',
+        '/orders/:id',
+        '/orders/:id/status'
+      ],
+      message: 'Welcome! The backend is deployed successfully 🚀'
+    };
   }
 }
