@@ -9,7 +9,7 @@ export class AppController {
 
   //Handle HTTP GET requests to the root route ('/')
   @Get()
-  getHello(): string {
+  getHello() {
     //Delegates the response generation to AppService and returns the result.
     return this.appService.getHello();
   }
